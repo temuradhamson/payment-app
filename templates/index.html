@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; padding: 40px 20px; }
+        .container { max-width: 700px; margin: 0 auto; }
+        h1 { font-size: 1.8rem; color: #1a1a2e; margin-bottom: 30px; }
+        .card { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 24px; }
+        .card h2 { font-size: 1rem; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+        .form-row { display: flex; gap: 12px; align-items: flex-end; }
+        .form-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 0.85rem; font-weight: 600; color: #444; }
+        input { padding: 12px 16px; border: 2px solid #e8e8e8; border-radius: 10px; font-size: 0.95rem; outline: none; }
+        input:focus { border-color: #6c63ff; }
+        button[type="submit"] { padding: 12px 24px; background: #6c63ff; color: white; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+        button[type="submit"]:hover { background: #5a52e0; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th { text-align: left; padding: 10px 14px; font-size: 0.8rem; text-transform: uppercase; color: #999; border-bottom: 2px solid #f0f0f0; }
+        tbody tr { border-bottom: 1px solid #f5f5f5; }
+        tbody tr:hover { background: #fafafa; }
+        tbody td { padding: 14px; font-size: 0.95rem; color: #333; }
+        .amount { font-weight: 700; color: #2ecc71; }
+        .date { font-size: 0.8rem; color: #aaa; }
+        .btn-delete { background: none; border: none; color: #ff6b6b; cursor: pointer; font-size: 1rem; padding: 4px 8px; border-radius: 6px; }
+        .btn-delete:hover { background: #fff0f0; }
+        .empty { text-align: center; padding: 40px; color: #bbb; }
+        .total { display: flex; justify-content: space-between; padding: 16px 14px 0; border-top: 2px solid #f0f0f0; margin-top: 8px; font-weight: 700; color: #444; }
+        .total span { color: #6c63ff; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💸 Payment Tracker</h1>
+    <div class="card">
+        <h2>Новая запись</h2>
+        <form action="/add" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name">Имя</label>
+                    <input type="text" id="name" name="name" placeholder="Иван Иванов" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Сумма</label>
+                    <input type="number" id="amount" name="amount" placeholder="10000" step="0.01" required>
+                </div>
+                <button type="submit">Добавить</button>
+            </div>
+        </form>
+    </div>
+    <div class="card">
+        <h2>Записи</h2>
+        {% if payments %}
+        <table>
+            <thead><tr><th>#</th><th>Имя</th><th>Сумма</th><th>Дата</th><th></th></tr></thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td style="color:#ccc">{{ p.id }}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="amount">{{ "{:,.2f}".format(p.amount) }}</td>
+                    <td class="date">{{ p.created_at }}</td>
+                    <td>
+                        <form action="/delete/{{ p.id }}" method="post" style="display:inline">
+                            <button class="btn-delete" type="submit">🗑</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="total"><span>Итого:</span><span>{{ "{:,.2f}".format(payments | sum(attribute='amount')) }}</span></div>
+        {% else %}
+        <div class="empty">Записей пока нет. Добавьте первую! 👆</div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
